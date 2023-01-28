@@ -22,6 +22,7 @@ func NewHeap(array []int) *Heap {
 	return &Heap{Array: array}
 }
 
+// Push 上浮操作
 func (h *Heap) Push(x int) {
 	// x为堆中插入的第一个元素
 	if h.Size == 0 {
@@ -53,6 +54,7 @@ func (h *Heap) Push(x int) {
 	h.Size++
 }
 
+// Pop 下沉操作
 func (h *Heap) Pop() int {
 	if h.Size == 0 {
 		return -1
