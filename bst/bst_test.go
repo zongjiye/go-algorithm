@@ -60,7 +60,7 @@ func TestBST(t *testing.T) {
 
 		Convey("Test Delete", func() {
 			log.Println(root.InOrderBST())
-			root.Delete(7)
+			root.Delete(3)
 			log.Println(root.InOrderBST())
 		})
 	})

@@ -90,54 +90,6 @@ func (bst *BinarySearchTree) Delete(val int) {
 	*bst = *deleteNode(bst, val)
 }
 
-func deleteNode(root *BinarySearchTree, val int) *BinarySearchTree {
-	if root == nil {
-		return nil
-	}
-
-	if val < root.Val {
-		root.Left = deleteNode(root.Left, val)
-		return root
-	}
-
-	if val > root.Val {
-		root.Right = deleteNode(root.Right, val)
-	}
-
-	// 找到要删除的节点位置
-	// 如果左子树为空 就返回右子树
-	if root.Left == nil {
-		return root.Right
-	}
-
-	if root.Right == nil {
-		return root.Left
-	}
-
-	// 左右 孩子都不空 从右子树中找到最小的节点
-	minNode := root.Right
-	for minNode.Left != nil {
-		minNode = minNode.Left
-	}
-
-	// 删除最小的节点
-	root.Val = minNode.Val
-	root.Right = deleteMinNode(root.Right)
-	return root
-}
-
-func deleteMinNode(root *BinarySearchTree) *BinarySearchTree {
-	// 找到最小的节点时, 删除右节点
-	if root.Left == nil {
-		pRight := root.Right
-		root.Right = nil
-		return pRight
-	}
-	// 一直向左找找到最小的左孩子
-	root.Left = deleteMinNode(root.Left)
-	return root
-}
-
 func (bst *BinarySearchTree) InOrderBST() (res []int) {
 	res = make([]int, 0)
 	var order func(root *BinarySearchTree)
@@ -151,4 +103,31 @@ func (bst *BinarySearchTree) InOrderBST() (res []int) {
 	}
 	order(bst)
 	return res
+}
+
+func deleteNode(root *BinarySearchTree, key int) *BinarySearchTree {
+	switch {
+	case root == nil:
+		return nil
+	case key < root.Val:
+		root.Left = deleteNode(root.Left, key)
+	case key > root.Val:
+		root.Right = deleteNode(root.Right, key)
+	case root.Left == nil || root.Right == nil:
+		if root.Left != nil {
+			return root.Left
+		}
+		return root.Right
+	default:
+		// 从右子树中寻找最小的节点
+		successor := root.Right
+		for successor.Left != nil {
+			successor = successor.Left
+		}
+		//
+		successor.Right = deleteNode(root.Right, successor.Val)
+		successor.Left = root.Left
+		return successor
+	}
+	return root
 }
