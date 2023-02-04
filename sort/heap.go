@@ -3,15 +3,15 @@ package sort
 import "algorithm-go/heap"
 
 func HeapSortN(list []int) {
-	h := heap.NewHeap(list)
+	h := heap.NewHeap()
 
 	// 最坏是O(nlog)
 	for _, v := range list {
 		h.Push(v)
 	}
 	// 最坏是O(nlog)
-	for range list {
-		h.Pop()
+	for i := range list {
+		list[i] = h.Pop()
 	}
 }
 

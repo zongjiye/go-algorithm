@@ -18,85 +18,77 @@ type Heap struct {
 	Array []int
 }
 
-func NewHeap(array []int) *Heap {
-	return &Heap{Array: array}
+func NewHeap() *Heap {
+	return &Heap{Array: make([]int, 0)}
 }
 
 // Push 上浮操作
 func (h *Heap) Push(x int) {
-	// x为堆中插入的第一个元素
-	if h.Size == 0 {
-		h.Array[0] = x
-		h.Size++
-		return
-	}
-
-	// i 是要插入节点的下标
-	i := h.Size
-	// 如果下标存在
-	// 将小的值 x 一直上浮
-	for i > 0 {
-		parent := (i - 1) / 2
-		// 如果插入的值小于等于父亲节点，那么可以直接退出循环，因为父亲仍然是最大的
-		if x <= h.Array[parent] {
-			break
-		}
-
-		// 否则交换
-		h.Array[i] = h.Array[parent]
-		i = parent
-	}
-
-	// 将该值 x 放在不会再翻转的位置
-	h.Array[i] = x
-
-	// 堆数量加一
+	// push
+	h.Array = append(h.Array, x)
 	h.Size++
+	// up
+	h.up(h.Len() - 1)
 }
 
 // Pop 下沉操作
 func (h *Heap) Pop() int {
-	if h.Size == 0 {
-		return -1
-	}
+	n := h.Len() - 1
+	h.Swap(0, n)
+	h.down(0, n)
 
-	// 取出根节点
-	ret := h.Array[0]
-
-	// 取出最后一个节点，将根节点放最后
+	// pop
+	temp := h.Array[n]
+	h.Array = h.Array[:n]
 	h.Size--
-	x := h.Array[h.Size]
-	h.Array[h.Size] = ret
+	return temp
+}
 
-	i := 0
+func (h *Heap) Len() int {
+	return h.Size
+}
+
+func (h *Heap) up(i int) {
 	for {
-		lc := 2*i + 1 // 左孩子
-		rc := 2*i + 2 // 右孩子
-
-		// 判断是否有左子树, 如果没有左子树 说明没有右子树
-		if lc >= h.Size {
+		parent := (i - 1) / 2 // parent
+		if i == parent || !h.Less(i, parent) {
 			break
 		}
+		h.Swap(i, parent)
+		i = parent
+	}
+}
 
-		// 有右子树, 比较左右子树的值大小 拿到最大值下标
-		if rc < h.Size && h.Array[rc] > h.Array[lc] {
-			lc = rc
-		}
-
-		// 父亲节点的值都大于或等于两个儿子较大的那个，不需要向下继续翻转了，返回
-		if x >= h.Array[lc] {
+func (h *Heap) down(i0, n int) bool {
+	i := i0
+	for {
+		j1 := 2*i + 1
+		if j1 >= n || j1 < 0 {
 			break
 		}
-
-		// 将较大的儿子与父亲交换，维持这个最大堆的特征
-		h.Array[i] = h.Array[lc]
-
-		// 继续往下操作
-		i = lc
+		j := j1 // left
+		// find max index in left of right child
+		if j2 := j1 + 1; j2 < n && h.Less(j2, j1) {
+			j = j2
+		}
+		// when left and child less than parent
+		if !h.Less(j, i) {
+			break
+		}
+		// swap
+		h.Swap(i, j)
+		i = j
 	}
 
-	// 将最后一个元素值放在不再翻转的位置
-	h.Array[i] = x
+	return i > i0
+}
 
-	return ret
+// Less 最大堆的实现
+func (h *Heap) Less(i, j int) bool {
+	return h.Array[i] < h.Array[j]
+}
+
+// Swap 交换
+func (h *Heap) Swap(i, j int) {
+	h.Array[i], h.Array[j] = h.Array[j], h.Array[i]
 }
